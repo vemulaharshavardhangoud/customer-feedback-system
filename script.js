@@ -1,16 +1,25 @@
 // ------------------- Local Storage Helpers -------------------
 function getData(key) {
-  return JSON.parse(localStorage.getItem(key)) || [];
+  try {
+    return JSON.parse(localStorage.getItem(key)) || [];
+  } catch (e) {
+    console.error(`Error parsing data from localStorage for key: ${key}`, e);
+    return [];
+  }
 }
 
 function saveData(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.error(`Error saving data to localStorage for key: ${key}`, e);
+  }
 }
 
-// ------------------- Preload Sample Data -------------------
+// ------------------- Preload 30 Records -------------------
 function preloadData() {
   if (!localStorage.getItem("products")) {
-    let products = [
+    const products = [
       { pid: 1, pname: "Wireless Headphones", pdesc: "Noise-cancelling Bluetooth headphones", price: 2499.99, img: "headphones.jpg" },
       { pid: 2, pname: "Smartphone X12", pdesc: "6.5-inch AMOLED, 128GB storage, 48MP camera", price: 32999, img: "smartphone.jpg" },
       { pid: 3, pname: "Gaming Laptop", pdesc: "RTX 4060 GPU, 16GB RAM, 512GB SSD", price: 84999, img: "laptop.jpg" },
@@ -26,7 +35,7 @@ function preloadData() {
   }
 
   if (!localStorage.getItem("customers")) {
-    let customers = [
+    const customers = [
       { cid: 1, fname: "Harsha", lname: "Vardhan", email: "harsha@example.com", phone: "9876543210" },
       { cid: 2, fname: "Riya", lname: "Sharma", email: "riya.sharma@example.com", phone: "9988776655" },
       { cid: 3, fname: "Aarav", lname: "Kumar", email: "aarav.kumar@example.com", phone: "9123456780" },
@@ -42,7 +51,7 @@ function preloadData() {
   }
 
   if (!localStorage.getItem("feedbacks")) {
-    let feedbacks = [
+    const feedbacks = [
       { fid: 1, pid: 1, cid: 1, rate: 5, comment: "Excellent sound quality, worth the price!" },
       { fid: 2, pid: 2, cid: 3, rate: 4, comment: "Good phone but battery drains fast." },
       { fid: 3, pid: 3, cid: 5, rate: 5, comment: "Perfect for gaming, runs smooth." },
@@ -57,55 +66,55 @@ function preloadData() {
     saveData("feedbacks", feedbacks);
   }
 }
+
+// Preload data on first load
 preloadData();
 
-// ------------------- Products -------------------
+// ------------------- Product CRUD -------------------
 function addProduct(pname, pdesc, price, img) {
-  let products = getData("products");
-  let pid = Date.now();
+  const products = getData("products");
+  const pid = Date.now();
   products.push({ pid, pname, pdesc, price, img });
   saveData("products", products);
 }
 
 function deleteProduct(pid) {
-  let products = getData("products").filter(p => p.pid !== pid);
+  const products = getData("products").filter(p => p.pid !== pid);
   saveData("products", products);
 }
 
 function updateProduct(pid, pname, pdesc, price, img) {
-  let products = getData("products");
-  let idx = products.findIndex(p => p.pid === pid);
+  const products = getData("products");
+  const idx = products.findIndex(p => p.pid === pid);
   if (idx !== -1) {
-    products[idx].pname = pname;
-    products[idx].pdesc = pdesc;
-    products[idx].price = price;
-    if (img) products[idx].img = img; // only update if new image is given
+    products[idx] = { ...products[idx], pname, pdesc, price };
+    if (img) products[idx].img = img;
     saveData("products", products);
   }
 }
 
-// ------------------- Customers -------------------
+// ------------------- Customer CRUD -------------------
 function addCustomer(fname, lname, email, phone) {
-  let customers = getData("customers");
-  let cid = Date.now();
+  const customers = getData("customers");
+  const cid = Date.now();
   customers.push({ cid, fname, lname, email, phone });
   saveData("customers", customers);
 }
 
 function deleteCustomer(cid) {
-  let customers = getData("customers").filter(c => c.cid !== cid);
+  const customers = getData("customers").filter(c => c.cid !== cid);
   saveData("customers", customers);
 }
 
-// ------------------- Feedback -------------------
+// ------------------- Feedback CRUD -------------------
 function addFeedback(pid, cid, rate, comment) {
-  let feedbacks = getData("feedbacks");
-  let fid = Date.now();
+  const feedbacks = getData("feedbacks");
+  const fid = Date.now();
   feedbacks.push({ fid, pid, cid, rate, comment });
   saveData("feedbacks", feedbacks);
 }
 
 function deleteFeedback(fid) {
-  let feedbacks = getData("feedbacks").filter(f => f.fid !== fid);
+  const feedbacks = getData("feedbacks").filter(f => f.fid !== fid);
   saveData("feedbacks", feedbacks);
 }
