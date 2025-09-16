@@ -28,18 +28,36 @@
   <div id="plist"></div>
 </div>
 
+<!-- Hidden Edit Form -->
+<div class="container" id="editBox" style="display:none;">
+  <h2>Edit Product</h2>
+  <input type="hidden" id="editPid">
+  <input type="text" id="editPname">
+  <textarea id="editPdesc"></textarea>
+  <input type="number" id="editPrice">
+  <input type="file" id="editImg">
+  <button onclick="updateProduct()">Update</button>
+  <button onclick="cancelEdit()">Cancel</button>
+</div>
+
 <script>
 function saveProduct() {
   let pname = document.getElementById("pname").value;
   let pdesc = document.getElementById("pdesc").value;
   let price = document.getElementById("price").value;
   let file = document.getElementById("pimg").files[0];
-  let reader = new FileReader();
-  reader.onload = function(e) {
-    addProduct(pname, pdesc, price, e.target.result);
+
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+      addProduct(pname, pdesc, price, e.target.result);
+      listProducts();
+    }
+    reader.readAsDataURL(file);
+  } else {
+    addProduct(pname, pdesc, price, "");
     listProducts();
   }
-  if (file) reader.readAsDataURL(file);
 }
 
 function listProducts() {
@@ -48,7 +66,9 @@ function listProducts() {
   products.forEach(p => {
     out += `<div class="card">
               <img src="${p.img}" width="80"><br>
-              ${p.pname} - ₹${p.price}
+              <b>${p.pname}</b> - ₹${p.price}<br>
+              ${p.pdesc}<br>
+              <button onclick="editProduct(${p.pid})">Edit</button>
               <button onclick="remove(${p.pid})">Delete</button>
             </div>`;
   });
@@ -58,6 +78,56 @@ function listProducts() {
 function remove(pid) {
   deleteProduct(pid);
   listProducts();
+}
+
+function editProduct(pid) {
+  let products = getData("products");
+  let p = products.find(x => x.pid === pid);
+  if (!p) return;
+
+  document.getElementById("editPid").value = p.pid;
+  document.getElementById("editPname").value = p.pname;
+  document.getElementById("editPdesc").value = p.pdesc;
+  document.getElementById("editPrice").value = p.price;
+
+  document.getElementById("editBox").style.display = "block";
+}
+
+function updateProduct() {
+  let pid = Number(document.getElementById("editPid").value);
+  let pname = document.getElementById("editPname").value;
+  let pdesc = document.getElementById("editPdesc").value;
+  let price = document.getElementById("editPrice").value;
+  let file = document.getElementById("editImg").files[0];
+
+  let products = getData("products");
+  let idx = products.findIndex(p => p.pid === pid);
+  if (idx === -1) return;
+
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+      products[idx].img = e.target.result;
+      products[idx].pname = pname;
+      products[idx].pdesc = pdesc;
+      products[idx].price = price;
+      saveData("products", products);
+      listProducts();
+      cancelEdit();
+    }
+    reader.readAsDataURL(file);
+  } else {
+    products[idx].pname = pname;
+    products[idx].pdesc = pdesc;
+    products[idx].price = price;
+    saveData("products", products);
+    listProducts();
+    cancelEdit();
+  }
+}
+
+function cancelEdit() {
+  document.getElementById("editBox").style.display = "none";
 }
 </script>
 </body>
