@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Products</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body onload="listProducts()">
+<header>
+  <h1>Manage Products</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="customers.html">Customers</a>
+    <a href="feedback.html">Feedback</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Add Product</h2>
+  <input type="text" id="pname" placeholder="Product Name">
+  <textarea id="pdesc" placeholder="Description"></textarea>
+  <input type="number" id="price" placeholder="Price">
+  <input type="file" id="pimg">
+  <button onclick="saveProduct()">Add</button>
+
+  <h2>Product List</h2>
+  <div id="plist"></div>
+</div>
+
+<script>
+function saveProduct() {
+  let pname = document.getElementById("pname").value;
+  let pdesc = document.getElementById("pdesc").value;
+  let price = document.getElementById("price").value;
+  let file = document.getElementById("pimg").files[0];
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    addProduct(pname, pdesc, price, e.target.result);
+    listProducts();
+  }
+  if (file) reader.readAsDataURL(file);
+}
+
+function listProducts() {
+  let products = getData("products");
+  let out = "";
+  products.forEach(p => {
+    out += `<div class="card">
+              <img src="${p.img}" width="80"><br>
+              ${p.pname} - ₹${p.price}
+              <button onclick="remove(${p.pid})">Delete</button>
+            </div>`;
+  });
+  document.getElementById("plist").innerHTML = out || "No products yet.";
+}
+
+function remove(pid) {
+  deleteProduct(pid);
+  listProducts();
+}
+</script>
+</body>
+</html>

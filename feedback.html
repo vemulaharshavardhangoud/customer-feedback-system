@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feedback</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body onload="listFeedbacks()">
+<header>
+  <h1>Feedback</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="customers.html">Customers</a>
+    <a href="feedback.html">Feedback</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Submit Feedback</h2>
+  <select id="pid"></select>
+  <select id="cid"></select>
+  <input type="number" id="rate" placeholder="Rating (1-5)">
+  <textarea id="comment" placeholder="Comment"></textarea>
+  <button onclick="saveFeedback()">Submit</button>
+
+  <h2>All Feedbacks</h2>
+  <div id="flist"></div>
+</div>
+
+<script>
+function populateOptions() {
+  let pSel = document.getElementById("pid");
+  let cSel = document.getElementById("cid");
+  getData("products").forEach(p => {
+    pSel.innerHTML += `<option value="${p.pid}">${p.pname}</option>`;
+  });
+  getData("customers").forEach(c => {
+    cSel.innerHTML += `<option value="${c.cid}">${c.fname} ${c.lname}</option>`;
+  });
+}
+populateOptions();
+
+function saveFeedback() {
+  addFeedback(
+    Number(document.getElementById("pid").value),
+    Number(document.getElementById("cid").value),
+    Number(document.getElementById("rate").value),
+    document.getElementById("comment").value
+  );
+  listFeedbacks();
+}
+
+function listFeedbacks() {
+  let feedbacks = getData("feedbacks");
+  let products = getData("products");
+  let customers = getData("customers");
+  let out = "";
+  feedbacks.forEach(f => {
+    let p = products.find(p => p.pid === f.pid);
+    let c = customers.find(c => c.cid === f.cid);
+    out += `<div class="card">
+              Product: ${p ? p.pname : "Unknown"}<br>
+              Customer: ${c ? c.fname : "Unknown"}<br>
+              Rating: ${f.rate}<br>
+              Comment: ${f.comment}<br>
+              <button onclick="removeFb(${f.fid})">Delete</button>
+            </div>`;
+  });
+  document.getElementById("flist").innerHTML = out || "No feedback yet.";
+}
+
+function removeFb(fid) {
+  deleteFeedback(fid);
+  listFeedbacks();
+}
+</script>
+</body>
+</html>

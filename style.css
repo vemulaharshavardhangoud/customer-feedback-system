@@ -1,0 +1,174 @@
+/* --------- Global Styles --------- */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* Moving aurora gradient */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --------- Floating Particles --------- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+  background-size: 50px 50px;
+  animation: moveStars 20s linear infinite;
+  z-index: -1;
+}
+
+@keyframes moveStars {
+  from { background-position: 0 0; }
+  to { background-position: 500px 500px; }
+}
+
+/* --------- Header --------- */
+header {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid #ffd700;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  background: linear-gradient(270deg, #ffd700, #ff6ec4, #23a6d5, #23d5ab);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 400% 400%;
+  animation: shine 6s ease infinite;
+}
+
+@keyframes shine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --------- Navbar --------- */
+nav a {
+  margin: 0 12px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.4s ease;
+}
+
+nav a:hover {
+  background: rgba(255,255,255,0.2);
+  color: #ffd700;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+/* --------- Container --------- */
+.container {
+  width: 85%;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: fadeUp 1s ease-out;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------- Forms --------- */
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #ddd;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  background: rgba(255,255,255,0.3);
+  box-shadow: 0 0 12px #ffd700;
+  transform: scale(1.03);
+}
+
+/* --------- Buttons --------- */
+button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(45deg, #ff6ec4, #7873f5, #23d5ab);
+  background-size: 200% 200%;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+button:hover {
+  animation: gradientMove 3s ease infinite;
+  transform: scale(1.15) rotateX(10deg);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --------- Cards --------- */
+.card {
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.card:hover {
+  transform: rotateY(12deg) rotateX(5deg) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* --------- Card Images --------- */
+.card img {
+  border-radius: 12px;
+  margin-bottom: 10px;
+  transition: transform 0.4s ease;
+}
+
+.card img:hover {
+  transform: scale(1.1) rotateZ(4deg);
+}

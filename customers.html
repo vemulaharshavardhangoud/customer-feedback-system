@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customers</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body onload="listCustomers()">
+<header>
+  <h1>Manage Customers</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="customers.html">Customers</a>
+    <a href="feedback.html">Feedback</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Add Customer</h2>
+  <input type="text" id="fname" placeholder="First Name">
+  <input type="text" id="lname" placeholder="Last Name">
+  <input type="email" id="email" placeholder="Email">
+  <input type="text" id="phone" placeholder="Phone">
+  <button onclick="saveCustomer()">Add</button>
+
+  <h2>Customer List</h2>
+  <div id="clist"></div>
+</div>
+
+<script>
+function saveCustomer() {
+  addCustomer(
+    document.getElementById("fname").value,
+    document.getElementById("lname").value,
+    document.getElementById("email").value,
+    document.getElementById("phone").value
+  );
+  listCustomers();
+}
+
+function listCustomers() {
+  let customers = getData("customers");
+  let out = "";
+  customers.forEach(c => {
+    out += `<div class="card">
+              ${c.fname} ${c.lname} - ${c.email}
+              <button onclick="removeCust(${c.cid})">Delete</button>
+            </div>`;
+  });
+  document.getElementById("clist").innerHTML = out || "No customers yet.";
+}
+
+function removeCust(cid) {
+  deleteCustomer(cid);
+  listCustomers();
+}
+</script>
+</body>
+</html>
