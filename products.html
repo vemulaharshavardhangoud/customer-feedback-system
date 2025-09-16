@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Products</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - Customer Feedback System</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js"></script>
 </head>
 <body onload="listProducts()">
+
 <header>
   <h1>Manage Products</h1>
   <nav>
@@ -18,69 +21,88 @@
 
 <div class="container">
   <h2>Add Product</h2>
-  <input type="text" id="pname" placeholder="Product Name">
-  <textarea id="pdesc" placeholder="Description"></textarea>
-  <input type="number" id="price" placeholder="Price">
-  <input type="file" id="pimg">
-  <button onclick="saveProduct()">Add</button>
+  <form id="addForm" onsubmit="event.preventDefault(); saveProduct();">
+    <input type="text" id="pname" placeholder="Product Name" required>
+    <textarea id="pdesc" placeholder="Description" required></textarea>
+    <input type="number" id="price" placeholder="Price" min="1" required>
+    <input type="file" id="pimg" accept="image/*">
+    <button type="submit">Add Product</button>
+  </form>
 
   <h2>Product List</h2>
   <div id="plist"></div>
 </div>
 
-<!-- Hidden Edit Form -->
-<div class="container" id="editBox" style="display:none;">
-  <h2>Edit Product</h2>
-  <input type="hidden" id="editPid">
-  <input type="text" id="editPname">
-  <textarea id="editPdesc"></textarea>
-  <input type="number" id="editPrice">
-  <input type="file" id="editImg">
-  <button onclick="updateProduct()">Update</button>
-  <button onclick="cancelEdit()">Cancel</button>
+<!-- Modal for Editing Product -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Product</h2>
+    <input type="hidden" id="editPid">
+    <input type="text" id="editPname" placeholder="Product Name" required>
+    <textarea id="editPdesc" placeholder="Description" required></textarea>
+    <input type="number" id="editPrice" placeholder="Price" min="1" required>
+    <input type="file" id="editImg" accept="image/*">
+    <button onclick="saveEdit()">Update</button>
+  </div>
 </div>
 
 <script>
+// -------- Add Product --------
 function saveProduct() {
-  let pname = document.getElementById("pname").value;
-  let pdesc = document.getElementById("pdesc").value;
-  let price = document.getElementById("price").value;
+  let pname = document.getElementById("pname").value.trim();
+  let pdesc = document.getElementById("pdesc").value.trim();
+  let price = parseFloat(document.getElementById("price").value);
   let file = document.getElementById("pimg").files[0];
+
+  if (!pname || !pdesc || !price) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  let pid = Date.now() + Math.floor(Math.random() * 1000);
 
   if (file) {
     let reader = new FileReader();
     reader.onload = function(e) {
       addProduct(pname, pdesc, price, e.target.result);
       listProducts();
+      document.getElementById("addForm").reset();
     }
     reader.readAsDataURL(file);
   } else {
-    addProduct(pname, pdesc, price, "");
+    addProduct(pname, pdesc, price, "https://via.placeholder.com/150");
     listProducts();
+    document.getElementById("addForm").reset();
   }
 }
 
+// -------- List Products --------
 function listProducts() {
   let products = getData("products");
   let out = "";
   products.forEach(p => {
     out += `<div class="card">
-              <img src="${p.img}" width="80"><br>
-              <b>${p.pname}</b> - ₹${p.price}<br>
-              ${p.pdesc}<br>
-              <button onclick="editProduct(${p.pid})">Edit</button>
+              <img src="${p.img || 'https://via.placeholder.com/150'}" 
+                   alt="Product Image" width="100">
+              <h3>${p.pname}</h3>
+              <p><b>₹${p.price}</b></p>
+              <p>${p.pdesc}</p>
+              <button onclick="openEditModal(${p.pid})">Edit</button>
               <button onclick="remove(${p.pid})">Delete</button>
             </div>`;
   });
-  document.getElementById("plist").innerHTML = out || "No products yet.";
+  document.getElementById("plist").innerHTML = out || "<p>No products yet.</p>";
 }
 
+// -------- Remove Product --------
 function remove(pid) {
   deleteProduct(pid);
   listProducts();
 }
 
-function editProduct(pid) {
+// -------- Open Edit Modal --------
+function openEditModal(pid) {
   let products = getData("products");
   let p = products.find(x => x.pid === pid);
   if (!p) return;
@@ -89,46 +111,44 @@ function editProduct(pid) {
   document.getElementById("editPname").value = p.pname;
   document.getElementById("editPdesc").value = p.pdesc;
   document.getElementById("editPrice").value = p.price;
+  document.getElementById("editImg").value = "";
 
-  document.getElementById("editBox").style.display = "block";
+  document.getElementById("editModal").style.display = "block";
 }
 
-function updateProduct() {
+// -------- Close Edit Modal --------
+function closeEditModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+
+// -------- Save Edited Product --------
+function saveEdit() {
   let pid = Number(document.getElementById("editPid").value);
-  let pname = document.getElementById("editPname").value;
-  let pdesc = document.getElementById("editPdesc").value;
-  let price = document.getElementById("editPrice").value;
+  let pname = document.getElementById("editPname").value.trim();
+  let pdesc = document.getElementById("editPdesc").value.trim();
+  let price = parseFloat(document.getElementById("editPrice").value);
   let file = document.getElementById("editImg").files[0];
 
-  let products = getData("products");
-  let idx = products.findIndex(p => p.pid === pid);
-  if (idx === -1) return;
+  if (!pname || !pdesc || !price) {
+    alert("Please fill all fields.");
+    return;
+  }
 
   if (file) {
     let reader = new FileReader();
     reader.onload = function(e) {
-      products[idx].img = e.target.result;
-      products[idx].pname = pname;
-      products[idx].pdesc = pdesc;
-      products[idx].price = price;
-      saveData("products", products);
+      updateProduct(pid, pname, pdesc, price, e.target.result);
       listProducts();
-      cancelEdit();
+      closeEditModal();
     }
     reader.readAsDataURL(file);
   } else {
-    products[idx].pname = pname;
-    products[idx].pdesc = pdesc;
-    products[idx].price = price;
-    saveData("products", products);
+    updateProduct(pid, pname, pdesc, price, null);
     listProducts();
-    cancelEdit();
+    closeEditModal();
   }
 }
-
-function cancelEdit() {
-  document.getElementById("editBox").style.display = "none";
-}
 </script>
+
 </body>
 </html>
