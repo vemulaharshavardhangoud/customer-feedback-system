@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Feedback System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body onload="showProducts()">
+<header>
+  <h1>Customer Feedback System</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="customers.html">Customers</a>
+    <a href="feedback.html">Feedback</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Featured Products</h2>
+  <div id="productList"></div>
+</div>
+
+<script>
+function showProducts() {
+  let products = getData("products");
+  let list = document.getElementById("productList");
+  if (products.length === 0) {
+    list.innerHTML = "<p>No products available</p>";
+    return;
+  }
+  list.innerHTML = products.map(p => `
+    <div class="card">
+      <img src="${p.img}" width="100"><br>
+      <strong>${p.pname}</strong><br>
+      ₹${p.price}<br>
+      ${p.pdesc}
+    </div>
+  `).join("");
+}
+</script>
+</body>
+</html>
